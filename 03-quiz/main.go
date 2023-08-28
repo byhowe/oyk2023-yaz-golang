@@ -18,8 +18,8 @@ type Item struct {
 type Items []Item
 
 // Calculate the discount ratio as percentage.
-func (self Item) DiscountRatio() float64 {
-	return (float64(self.Discount) / float64(self.RawPrice)) * 100
+func (item Item) DiscountRatio() float64 {
+	return (float64(item.Discount) / float64(item.RawPrice)) * 100
 }
 
 // Convert kuruş to lira
@@ -28,19 +28,19 @@ func kurusToLira(kurus uint) float64 {
 }
 
 // Calculate the discounted price in kuruş.
-func (self Item) calculatePrice() uint {
-	return self.RawPrice - self.Discount
+func (item Item) calculatePrice() uint {
+	return item.RawPrice - item.Discount
 }
 
 // Calculate the discounted price in liras.
-func (self Item) Price() float64 {
-	return float64(self.calculatePrice()) / 100.0
+func (item Item) Price() float64 {
+	return float64(item.calculatePrice()) / 100.0
 }
 
 // Sum total price of items with discount.
-func (self Items) TotalPrice() float64 {
+func (items Items) TotalPrice() float64 {
 	var total uint
-	for _, item := range self {
+	for _, item := range items {
 		total += item.calculatePrice()
 	}
 	return kurusToLira(total)
@@ -49,32 +49,32 @@ func (self Items) TotalPrice() float64 {
 // Return a description string.
 //
 // Includes the name and the price information about the item.
-func (self Item) Description() string {
-	return fmt.Sprintf("%Q", self)
+func (item Item) Description() string {
+	return fmt.Sprintf("%Q", item)
 }
 
-func (self Items) Description() string {
-	return fmt.Sprintf("%d item(s) worth %.2f liras", len(self), self.TotalPrice())
+func (items Items) Description() string {
+	return fmt.Sprintf("%d item(s) worth %.2f liras", len(items), items.TotalPrice())
 }
 
 // Custom formatter that prints the description of the item using the 'Q' verb.
-func (self Item) Format(f fmt.State, verb rune) {
+func (item Item) Format(f fmt.State, verb rune) {
 	switch verb {
 	case rune('Q'):
-		if self.Discount != 0 {
+		if item.Discount != 0 {
 			fmt.Fprintf(
 				f,
 				"%s - %v (%%%.2f TL indirimle %v TL)",
-				self.Name,
-				kurusToLira(self.RawPrice),
-				self.DiscountRatio(),
-				self.Price(),
+				item.Name,
+				kurusToLira(item.RawPrice),
+				item.DiscountRatio(),
+				item.Price(),
 			)
 		} else {
-			fmt.Fprintf(f, "%s - %v TL", self.Name, self.Price())
+			fmt.Fprintf(f, "%s - %v TL", item.Name, item.Price())
 		}
 	default:
-		fmt.Fprint(f, self)
+		fmt.Fprint(f, item)
 	}
 }
 
