@@ -53,6 +53,10 @@ func (self Item) Description() string {
 	return fmt.Sprintf("%Q", self)
 }
 
+func (self Items) Description() string {
+	return fmt.Sprintf("%d item(s) worth %.2f liras", len(self), self.TotalPrice())
+}
+
 // Custom formatter that prints the description of the item using the 'Q' verb.
 func (self Item) Format(f fmt.State, verb rune) {
 	switch verb {
@@ -60,7 +64,7 @@ func (self Item) Format(f fmt.State, verb rune) {
 		if self.Discount != 0 {
 			fmt.Fprintf(
 				f,
-				"%s - %v (%%%.1f TL indirimle %v TL)",
+				"%s - %v (%%%.2f TL indirimle %v TL)",
 				self.Name,
 				kurusToLira(self.RawPrice),
 				self.DiscountRatio(),
@@ -84,6 +88,5 @@ func main() {
 		fmt.Printf("%Q\n", item)
 	}
 
-	total := items.TotalPrice()
-	fmt.Printf("Toplam Fiyat: %v TL\n", total)
+	fmt.Println(items.Description())
 }
