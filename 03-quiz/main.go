@@ -15,6 +15,11 @@ type Item struct {
 	Discount uint
 }
 
+// Calculate the discount ratio as percentage.
+func (self Item) calculateDiscountRatio() float64 {
+	return (float64(self.Discount) / float64(self.RawPrice)) * 100
+}
+
 // Convert kuruş to lira
 func kurusToLira(kurus uint) float64 {
 	return float64(kurus) / 100.0
@@ -44,10 +49,10 @@ func (self Item) Format(f fmt.State, verb rune) {
 		if self.Discount != 0 {
 			fmt.Fprintf(
 				f,
-				"%s - %v (%v TL indirimle %v TL)",
+				"%s - %v (%%%.1f TL indirimle %v TL)",
 				self.Name,
 				kurusToLira(self.RawPrice),
-				kurusToLira(self.Discount),
+				self.calculateDiscountRatio(),
 				self.CalculatePrice(),
 			)
 		} else {
@@ -74,7 +79,7 @@ func main() {
 	}
 
 	for _, item := range items {
-		fmt.Println(item.Description())
+		fmt.Printf("%Q\n", item)
 	}
 
 	total := TotalPrice(items)
