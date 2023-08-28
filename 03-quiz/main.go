@@ -15,8 +15,10 @@ type Item struct {
 	Discount uint
 }
 
+type Items []Item
+
 // Calculate the discount ratio as percentage.
-func (self Item) calculateDiscountRatio() float64 {
+func (self Item) DiscountRatio() float64 {
 	return (float64(self.Discount) / float64(self.RawPrice)) * 100
 }
 
@@ -31,8 +33,17 @@ func (self Item) calculatePrice() uint {
 }
 
 // Calculate the discounted price in liras.
-func (self Item) CalculatePrice() float64 {
+func (self Item) Price() float64 {
 	return float64(self.calculatePrice()) / 100.0
+}
+
+// Sum total price of items with discount.
+func (self Items) TotalPrice() float64 {
+	var total uint
+	for _, item := range self {
+		total += item.calculatePrice()
+	}
+	return kurusToLira(total)
 }
 
 // Return a description string.
@@ -52,28 +63,19 @@ func (self Item) Format(f fmt.State, verb rune) {
 				"%s - %v (%%%.1f TL indirimle %v TL)",
 				self.Name,
 				kurusToLira(self.RawPrice),
-				self.calculateDiscountRatio(),
-				self.CalculatePrice(),
+				self.DiscountRatio(),
+				self.Price(),
 			)
 		} else {
-			fmt.Fprintf(f, "%s - %v TL", self.Name, self.CalculatePrice())
+			fmt.Fprintf(f, "%s - %v TL", self.Name, self.Price())
 		}
 	default:
 		fmt.Fprint(f, self)
 	}
 }
 
-// Sum total price of items with discount.
-func TotalPrice(items []Item) float64 {
-	var total uint
-	for _, item := range items {
-		total += item.calculatePrice()
-	}
-	return kurusToLira(total)
-}
-
 func main() {
-	items := []Item{
+	items := Items{
 		{Name: "Elma", RawPrice: 75, Discount: 7},
 		{Name: "Portakal", RawPrice: 100, Discount: 0},
 	}
@@ -82,6 +84,6 @@ func main() {
 		fmt.Printf("%Q\n", item)
 	}
 
-	total := TotalPrice(items)
+	total := items.TotalPrice()
 	fmt.Printf("Toplam Fiyat: %v TL\n", total)
 }
